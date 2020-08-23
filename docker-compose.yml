@@ -1,0 +1,35 @@
+version: '3'
+services:
+  app:
+    build: .
+    command: bundle exec rails resque:work
+    environment:
+      DB_HOST: db
+      DB_PASSWORD: apartment
+      REDIS_URL: redis://redis
+      QUEUE: '*'
+    volumes:
+      - .:/app:cached
+      - bundle:/usr/local/bundle
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+      - redis
+  db:
+    image: mysql:5.6.21
+    environment:
+      MYSQL_ROOT_PASSWORD: apartment
+    volumes:
+      - db:/var/lib/mysql
+    ports:
+      - 3306:3306
+  redis:
+    image: redis:5.0.3
+    ports:
+      - 6379:6379
+volumes:
+  bundle:
+    driver: local
+  db:
+    driver: local
